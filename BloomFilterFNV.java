@@ -1,47 +1,35 @@
+import java.math.BigInteger;
 
 public class BloomFilterFNV extends BloomFilter
-{
+{	
 	public BloomFilterFNV(int setSize, int bitsPerElement)
 	{
-		super(setSize, bitsPerElement);		
+		super(setSize, bitsPerElement);
+		hashFunctions[0] = new HashFunctionFNV();
 	}// end constructor BloomFilterFNV
 	
-	/* Adds the string s to the filter. 
-	 * This method should be case-insensitive. */
-	public void add(String s)
+	private class HashFunctionFNV extends HashFunction
 	{
+		private final BigInteger FNV_INIT = new BigInteger("109951168211");
+		private final BigInteger FNV_PRIME = new BigInteger("14695981039346656037");
+		private final BigInteger FNV_BIG = new BigInteger("9223372036854775807");
 		
-	}// end function add
-	
-	/* Returns true if s appears in the filter; otherwise returns false. 
-	 * This method must be case-insensitive */
-	public boolean appears(String s)
-	{
-		return true;
-	}// end function appears
-	
-	/* Returns the size of the filter (the size of the table). */
-	public int filterSize()
-	{
-		return super.filterSize();
-	}// end function filterSize
-	
-	/* Returns the number of elements added to the filter. */
-	public int dataSize()
-	{
-		return 0;
-	}// end function dataSize
-	
-	/* Returns the number of hash function used */
-	public int numHashes()
-	{
-		return super.numHashes();
-	}// end function numHashes
-	
-	public void test()
-	{
-		System.out.println(filterSize());
-		System.out.println(numHashes());
-	}
+	    public int hash(String s)
+	    {
+	    	return hash(s.getBytes());
+	    }// end hash function
+	    
+	    private int hash(byte[] k) 
+	    {
+	        long h = FNV_INIT.longValue();
+	        int len = k.length;
+	        for(int i = 0; i < len; i++) {
+	            h ^= k[i];
+	            h = mod(h * FNV_PRIME.longValue(), FNV_BIG.longValue());
+	        }// end for loop over all bytes
+	        return mod(h, size);
+	    }// end function hashFNV
+
+	}// end class HashFunctionFNV
 	
 }// end class BloomFilterFNV
